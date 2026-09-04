@@ -1,0 +1,72 @@
+{
+  "title": "FeaturedActionsState",
+  "type": "object",
+  "additionalProperties": false,
+  "definitions": {
+    "flair": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 12
+    },
+    "allowance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["limit", "remaining"],
+      "properties": {
+        "limit": { "type": "integer", "minimum": 0 },
+        "remaining": { "type": "integer", "minimum": 0 },
+        "label": { "type": "string", "minLength": 1 }
+      }
+    }
+  },
+  "required": ["schemaVersion", "revision", "title", "items", "sayToOwner"],
+  "properties": {
+    "schemaVersion": { "const": "featured-actions-v1" },
+    "revision": { "type": "integer", "minimum": 1 },
+    "eyebrow": { "type": "string" },
+    "title": { "type": "string", "minLength": 1 },
+    "description": { "type": "string" },
+    "caution": { "type": "string" },
+    "cautionFlair": { "$ref": "#/definitions/flair" },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label", "available", "statusText", "actionLabel"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "label": { "type": "string", "minLength": 1 },
+          "detail": { "type": "string" },
+          "flair": { "$ref": "#/definitions/flair" },
+          "allowance": { "$ref": "#/definitions/allowance" },
+          "available": { "type": "boolean" },
+          "statusText": { "type": "string", "minLength": 1 },
+          "actionLabel": { "type": "string", "minLength": 1 },
+          "successText": { "type": "string" },
+          "triggeredStatusText": { "type": "string" },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["id", "kind", "label", "required"],
+              "properties": {
+                "id": { "type": "string", "minLength": 1 },
+                "kind": { "enum": ["phone", "text"] },
+                "label": { "type": "string", "minLength": 1 },
+                "placeholder": { "type": "string" },
+                "hint": { "type": "string" },
+                "required": { "type": "boolean" }
+              }
+            }
+          },
+          "lastTriggeredAt": { "type": "string", "format": "date-time" },
+          "nextEligibleAt": { "type": "string", "format": "date-time" }
+        }
+      }
+    },
+    "footer": { "type": "string" },
+    "sayToOwner": { "type": "string", "minLength": 1 }
+  }
+}

@@ -1,0 +1,84 @@
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    min-height: 100%;
+    background: var(--theme-bg-app);
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    color: var(--theme-text);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: var(--theme-bg-app);
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  a {
+    color: var(--theme-text-link);
+    text-underline-offset: 0.2em;
+    transition: color var(--duration-fast) var(--ease-default);
+  }
+
+  a:hover {
+    color: var(--theme-text-link-hover);
+  }
+
+  img,
+  svg,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+
+  ::selection {
+    background: var(--palette-coral-200);
+    color: var(--theme-text);
+  }
+
+  :focus-visible {
+    outline: none;
+    box-shadow: var(--theme-focus-ring);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}

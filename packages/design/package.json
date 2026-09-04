@@ -1,0 +1,23 @@
+{
+  "name": "@phonebooth/design",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./styles/tokens.css": "./src/styles/tokens.css",
+    "./styles/global.css": "./src/styles/global.css"
+  },
+  "scripts": {
+    "typecheck": "svelte-check --tsconfig ./tsconfig.json"
+  },
+  "peerDependencies": {
+    "svelte": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.2",
+    "svelte": "^5.57.0",
+    "svelte-check": "^4.7.6",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,33 @@
+@import 'tailwindcss';
+@import '@phonebooth/design/styles/tokens.css';
+@import '@phonebooth/design/styles/global.css';
+
+@source '../../../packages/design/src';
+
+@layer base {
+  h1,
+  h2,
+  h3,
+  p {
+    margin-block-start: 0;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    line-height: var(--leading-tight);
+  }
+
+  pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+}
+
+@layer components {
+  [data-untrusted] {
+    border-left: 3px solid var(--theme-warning);
+    padding-left: var(--space-4);
+  }
+}

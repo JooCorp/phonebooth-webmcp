@@ -1,0 +1,154 @@
+[
+  {
+    "name": "check_account",
+    "description": "Check whether the person is signed in to JooVoice and what setup is still missing. Call this first.",
+    "inputSchema": { "type": "object", "properties": {}, "required": [] },
+    "annotations": { "readOnlyHint": true }
+  },
+  {
+    "name": "check_featured_actions",
+    "description": "Check whether this account has an optional featured action panel and get its current presentation, availability, and allowance. Use this before suggesting or triggering a featured action.",
+    "inputSchema": { "type": "object", "properties": {}, "required": [] },
+    "annotations": { "readOnlyHint": true }
+  },
+  {
+    "name": "trigger_featured_action",
+    "description": "Trigger one server-owned featured action. Check check_featured_actions first and do not trigger an item whose available value is false. Supply only the opaque action id and field values declared by that item; the service owns the action content and accepts no free-form instructions.",
+    "inputSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "actionId": { "type": "string", "minLength": 1, "description": "The opaque item id returned by check_featured_actions." },
+        "values": { "type": "object", "description": "Values for fields declared by the selected item.", "additionalProperties": { "type": "string" } },
+        "expectedRevision": { "type": "integer", "minimum": 1, "description": "The revision returned by check_featured_actions." },
+        "invocationId": { "type": "string", "minLength": 1, "description": "A unique id for this invocation; repeats do not place another call." }
+      },
+      "required": ["actionId", "values", "expectedRevision", "invocationId"]
+    },
+    "annotations": { "destructiveHint": false, "idempotentHint": true, "openWorldHint": true }
+  },
+  {
+    "name": "create_call_request",
+    "description": "Ask JooVoice to phone a business or a person and get an answer. Give the request in plain words, the phone number, and the person's timezone. You get a request id back within a second; JooVoice may then ask a few questions before calling.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "request": { "type": "string", "description": "What to ask, in plain words.", "minLength": 1, "maxLength": 2000 },
+        "phone": { "type": "string", "description": "The number to call, in E.164 form." },
+        "ownerTimezone": { "type": "string", "description": "IANA timezone of the person." },
+        "deadline": { "type": "string", "description": "Latest useful time, ISO 8601." },
+        "earliest": { "type": "string", "description": "Earliest useful time, ISO 8601." },
+        "calleeCity": { "type": "string", "description": "City of the number being called." },
+        "callNow": { "type": "boolean", "description": "Place the call as soon as a person presses the button." },
+        "invocationId": { "type": "string", "description": "A unique id for this invocation; repeats return the same request." }
+      },
+      "required": ["request", "phone", "ownerTimezone"]
+    },
+    "annotations": {}
+  },
+  {
+    "name": "answer_call_questions",
+    "description": "Answer the questions JooVoice asked for a call request. Partial answers are fine; required ones are marked.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "callRequestId": { "type": "string", "description": "The call request id." },
+        "questionSetId": { "type": "string", "description": "The question set being answered." },
+        "answers": {
+          "type": "array",
+          "description": "One entry per question.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "value": { "type": "string" },
+              "choiceId": { "type": "string" },
+              "note": { "type": "string", "description": "Additional text requested by the selected choice." },
+              "skip": { "type": "boolean" }
+            },
+            "required": ["id"]
+          }
+        },
+        "additionalDetails": { "type": "string", "maxLength": 2000, "description": "Any extra context JooVoice should use for this call. Optional." },
+        "invocationId": { "type": "string", "description": "A unique id for this invocation; repeats return the same result." }
+      },
+      "required": ["callRequestId", "questionSetId", "answers"]
+    },
+    "annotations": {}
+  },
+  {
+    "name": "check_call_request",
+    "description": "Get the current status, questions, or result of one call request. Cheap; use the checkAfterSeconds hint.",
+    "inputSchema": {
+      "type": "object",
+      "properties": { "callRequestId": { "type": "string", "description": "The call request id." } },
+      "required": ["callRequestId"]
+    },
+    "annotations": { "readOnlyHint": true, "untrustedContentHint": true }
+  },
+  {
+    "name": "wait_for_call_request",
+    "description": "Wait up to 25 seconds for a call request to change, then return its status.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "callRequestId": { "type": "string", "description": "The call request id." },
+        "maxWaitSeconds": { "type": "number", "description": "How long to hold the request open.", "minimum": 1, "maximum": 25 }
+      },
+      "required": ["callRequestId"]
+    },
+    "annotations": { "readOnlyHint": true, "untrustedContentHint": true }
+  },
+  {
+    "name": "list_call_requests",
+    "description": "List the person's recent call requests with their current status.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "status": { "type": "string", "description": "Filter by one status." },
+        "limit": { "type": "number", "description": "How many to return.", "minimum": 1, "maximum": 20 }
+      },
+      "required": []
+    },
+    "annotations": { "readOnlyHint": true, "untrustedContentHint": true }
+  },
+  {
+    "name": "cancel_call_request",
+    "description": "Cancel a call request that has not been placed yet.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "callRequestId": { "type": "string", "description": "The call request id." },
+        "reason": { "type": "string", "description": "Why the request is being cancelled." }
+      },
+      "required": ["callRequestId"]
+    },
+    "annotations": {}
+  },
+  {
+    "name": "request_report_back_call",
+    "description": "Ask JooVoice to phone the person on their own verified number with the result once the call is done. Once per request.",
+    "inputSchema": {
+      "type": "object",
+      "properties": { "callRequestId": { "type": "string", "description": "The call request id." } },
+      "required": ["callRequestId"]
+    },
+    "annotations": {}
+  },
+  {
+    "name": "prefill_interview",
+    "description": "Fill in the setup answers you already know for the person. The person still reviews and submits.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "answers": {
+          "type": "object",
+          "description": "Setup field ids mapped to values.",
+          "additionalProperties": { "type": "string" }
+        }
+      },
+      "required": ["answers"]
+    },
+    "annotations": {}
+  }
+]

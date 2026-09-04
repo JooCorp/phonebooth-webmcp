@@ -1,0 +1,26 @@
+{
+  "title": "ErrorGuide",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kind", "headline", "fix", "next", "sayToOwner"],
+  "properties": {
+    "kind": { "enum": ["owner_action_required", "not_allowed_right_now", "fix_the_request", "questions_changed", "try_again_shortly", "something_went_wrong"] },
+    "headline": { "type": "string", "minLength": 1 },
+    "fix": { "type": "string", "minLength": 1 },
+    "next": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["tool", "args"],
+        "properties": {
+          "tool": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+          "args": { "type": "object" },
+          "after": { "const": "checkAfterSeconds" }
+        }
+      }
+    },
+    "sayToOwner": { "type": "string", "minLength": 1 },
+    "retryAfterSeconds": { "type": "integer", "minimum": 1 }
+  }
+}

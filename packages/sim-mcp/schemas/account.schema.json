@@ -1,0 +1,252 @@
+{
+  "title": "AccountObject",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "loggedIn",
+    "accountState",
+    "welcomeCall",
+    "blockers",
+    "phone",
+    "urls",
+    "sayToOwner",
+    "next",
+    "docs"
+  ],
+  "properties": {
+    "loggedIn": {
+      "type": "boolean"
+    },
+    "accountState": {
+      "enum": [
+        "active",
+        "setup_required",
+        "suspended"
+      ]
+    },
+    "displayName": {
+      "type": "string"
+    },
+    "welcomeCall": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "phoneAlias",
+        "acknowledged"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "required",
+            "requested",
+            "calling",
+            "complete"
+          ]
+        },
+        "phoneAlias": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "acknowledged": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "code",
+            "text"
+          ],
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "text": {
+              "type": "string"
+            },
+            "retryAfter": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "text",
+          "url"
+        ],
+        "properties": {
+          "code": {
+            "enum": [
+              "profile_name_missing",
+              "phone_unverified",
+              "calling_consent_missing",
+              "no_calling_credit",
+              "account_suspended",
+              "profile_sunset"
+            ]
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      }
+    },
+    "phone": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "verified",
+        "alias",
+        "reportBackConsented"
+      ],
+      "properties": {
+        "verified": {
+          "type": "boolean"
+        },
+        "alias": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reportBackConsented": {
+          "type": "boolean"
+        }
+      }
+    },
+    "urls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "web",
+        "dashboard",
+        "connect"
+      ],
+      "properties": {
+        "web": {
+          "type": "string",
+          "format": "uri"
+        },
+        "dashboard": {
+          "type": "string",
+          "format": "uri"
+        },
+        "connect": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "sayToOwner": {
+      "type": "string",
+      "minLength": 1
+    },
+    "next": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "tool",
+          "args"
+        ],
+        "properties": {
+          "tool": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+$"
+          },
+          "args": {
+            "type": "object"
+          },
+          "after": {
+            "const": "checkAfterSeconds"
+          }
+        }
+      }
+    },
+    "docs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^joovoice://docs/"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "loggedIn": {
+            "const": true
+          },
+          "accountState": {
+            "const": "setup_required"
+          }
+        },
+        "required": [
+          "loggedIn",
+          "accountState"
+        ]
+      },
+      "then": {
+        "properties": {
+          "blockers": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "accountState": {
+            "const": "active"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "blockers": {
+            "maxItems": 0
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "loggedIn": {
+            "const": false
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "blockers": {
+            "maxItems": 0
+          }
+        },
+        "not": {
+          "required": [
+            "displayName"
+          ]
+        }
+      }
+    }
+  ]
+}

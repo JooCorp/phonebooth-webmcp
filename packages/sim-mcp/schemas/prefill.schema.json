@@ -1,0 +1,23 @@
+{
+  "title": "PrefillResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["prefill", "sayToOwner", "next"],
+  "properties": {
+    "prefill": { "type": "object", "additionalProperties": { "type": "string" } },
+    "sayToOwner": { "type": "string", "minLength": 1 },
+    "next": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["tool", "args"],
+        "properties": {
+          "tool": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+          "args": { "type": "object" },
+          "after": { "const": "checkAfterSeconds" }
+        }
+      }
+    }
+  }
+}
